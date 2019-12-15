@@ -9,7 +9,7 @@ private:
 	size_t _population;
 
 public:
-	c_city();
+	c_city(string p_name = "");
 	~c_city();
 
 	void set_name(string p_name){_name = p_name;}

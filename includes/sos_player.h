@@ -7,8 +7,8 @@ private:
 	Vector2 _pos;
 
 public:
-	// c_player();
-	// ~c_player();
+	c_player();
+	~c_player();
 };
 
 #endif

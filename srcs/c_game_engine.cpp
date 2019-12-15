@@ -10,17 +10,19 @@ c_game_engine::c_game_engine() : c_widget()
 	_board_size = g_board_size;
 	_tile_size = Vector2(64, 64);
 	_board.resize(_board_size.x);
-	int target_x = (_board_size.x / 2);
-	int target_y = (_board_size.x / 2);
 	for (size_t i = 0; i < _board_size.x; i++)
 	{
 		_board[i].resize(_board_size.y);
 		for (size_t j = 0; j < _board_size.y; j++)
-		{
 			_board[i][j] = c_tile(tile_type::empty);
-		}
 	}
 	populate_board();
+
+	_city = c_city("Epic city name !");
+	_player = c_player();
+	_city_panel = new c_city_panel(this);
+	_city_panel->set_city(&_city);
+	_city_panel->activate();
 }
 c_game_engine::~c_game_engine()
 {
@@ -62,8 +64,7 @@ void c_game_engine::populate_board()
 		{
 			Vector2 tmp = Vector2(i + 0.5f, j + 0.5f);
 			if (city_pos.distance(tmp) < 1.414f && _board[i][j].discovered() != tile_state::seen)
-			_board[i][j].set_discovered(tile_state::discovered);
-			_board[i][j].set_discovered(tile_state::seen);
+				_board[i][j].set_discovered(tile_state::discovered);
 			_board[i][j].set_nb_zombie(generate_zombie(city_pos.distance(tmp)));
 		}
 
@@ -96,6 +97,10 @@ Vector2 c_game_engine::screen_size()
 void c_game_engine::set_geometry_imp(Vector2 p_anchor, Vector2 p_area)
 {
 	viewport()->set_viewport(p_anchor, p_area);
+
+	Vector2 panel_coord = Vector2(_board_size.x * _tile_size.x + 60, 15.0f);
+	Vector2 panel_size = Vector2(450.0f, _board_size.y * _tile_size.y + 60) - Vector2(15.0f, 30.0f);
+	_city_panel->set_geometry(panel_coord, panel_size);
 }
 
 void c_game_engine::render()
