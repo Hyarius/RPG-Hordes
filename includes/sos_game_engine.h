@@ -4,6 +4,7 @@
 class c_game_engine : public c_widget
 {
 private:
+	c_player _player;
 	c_tileset _tileset;
 	Vector2 _board_size;
 	Vector2 _tile_size;

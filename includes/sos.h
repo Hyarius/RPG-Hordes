@@ -5,6 +5,7 @@
 #include "sos_includes.h"
 
 #include "sos_city.h"
+#include "sos_player.h"
 #include "sos_tiles.h"
 #include "sos_city_panel.h"
 #include "sos_game_engine.h"

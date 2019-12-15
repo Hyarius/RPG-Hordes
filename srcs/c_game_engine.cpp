@@ -6,7 +6,7 @@ size_t nb_elem[6] = {24, 6, 2, 5, 4, 6};
 
 c_game_engine::c_game_engine() : c_widget()
 {
-	_tileset = c_tileset("ressources/tileset/base_tileset.png", Vector2(4, 4));
+	_tileset = c_tileset("ressources/tileset/base_tileset.png", Vector2(4, 5));
 	_board_size = g_board_size;
 	_tile_size = Vector2(64, 64);
 	_board.resize(_board_size.x);
@@ -44,6 +44,7 @@ int generate_zombie(float distance)
 		return (5);
 	else if (value < 100)
 		return (6);
+	return (7);
 }
 
 void c_game_engine::populate_board()
@@ -61,7 +62,8 @@ void c_game_engine::populate_board()
 		{
 			Vector2 tmp = Vector2(i + 0.5f, j + 0.5f);
 			if (city_pos.distance(tmp) < 1.414f && _board[i][j].discovered() != tile_state::seen)
-				_board[i][j].set_discovered(tile_state::discovered);
+			_board[i][j].set_discovered(tile_state::discovered);
+			_board[i][j].set_discovered(tile_state::seen);
 			_board[i][j].set_nb_zombie(generate_zombie(city_pos.distance(tmp)));
 		}
 
