@@ -14,27 +14,29 @@ enum class tile_type
 
 enum class tile_state
 {
+	error = -1,
 	unknown = 0,
 	discovered = 1,
-	seen = 2
+	seen = 2,
+	reveal = 3
 };
 
 class c_tile
 {
 private:
 	tile_type _type;
-	tile_state _discovered;
+	tile_state _status;
 	int _nb_zombie;
 
 public:
-	c_tile(tile_type p_type = tile_type::empty, tile_state p_discovered = tile_state::unknown);
+	c_tile(tile_type p_type = tile_type::empty, tile_state p_status = tile_state::unknown);
 	~c_tile();
 
 	void set_type(tile_type p_type){_type = p_type;}
 	tile_type type(){return (_type);}
 
-	void set_discovered(tile_state p_discovered){_discovered = p_discovered;}
-	tile_state discovered(){return (_discovered);}
+	void set_status(tile_state p_status){_status = p_status;}
+	tile_state status(){return (_status);}
 
 	void set_nb_zombie(int p_nb_zombie){_nb_zombie = p_nb_zombie;}
 	int nb_zombie(){return (_nb_zombie);}
