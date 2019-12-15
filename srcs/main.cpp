@@ -1,6 +1,13 @@
 #include "sos.h"
 
 Vector2 g_board_size = Vector2(13, 13);
+Vector2 neighbour[5] = {
+	Vector2(0, 0),
+	Vector2(1, 0),
+	Vector2(0, 1),
+	Vector2(-1, 0),
+	Vector2(0, -1),
+};
 
 int main(int argc, char**argv)
 {

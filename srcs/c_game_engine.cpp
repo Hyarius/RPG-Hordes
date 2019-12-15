@@ -1,20 +1,6 @@
 #include "sos.h"
 
-extern Vector2 g_board_size;
-
 size_t nb_elem[6] = {24, 6, 2, 5, 4, 6};
-#define SELF 0
-#define RIGHT 1
-#define DOWN 2
-#define LEFT 3
-#define UP 4
-Vector2 neighbour[5] = {
-	Vector2(0, 0),
-	Vector2(1, 0),
-	Vector2(0, 1),
-	Vector2(-1, 0),
-	Vector2(0, -1),
-};
 
 c_game_engine::c_game_engine() : c_widget()
 {
@@ -72,6 +58,8 @@ void c_game_engine::populate_board()
 	_board[city_pos.x][city_pos.y].set_type(static_cast<tile_type>(1));
 	_board[city_pos.x][city_pos.y].set_status(tile_state::reveal);
 	_player.set_pos(Vector2(static_cast<int>(city_pos.x), static_cast<int>(city_pos.y)));
+	_player.set_draw_pos(_player.pos());
+	_player.set_old_pos(_player.pos());
 
 	for (int i = 0; i < _board_size.x; i++)
 		for (int j = 0; j < _board_size.y; j++)
@@ -183,23 +171,7 @@ void c_game_engine::render()
 			}
 		}
 	}
-	_tileset.draw(12, _player.pos() * _tile_size + 30, _tile_size);
-
-	//Down
-	if (is_inside(_player.pos() + neighbour[DOWN]) == true)
-		_tileset.draw(16, _player.pos() * _tile_size + 30 + Vector2(0.0f, _tile_size.y / 2.0f), _tile_size);
-
-	//Left
-	if (is_inside(_player.pos() + neighbour[LEFT]) == true)
-		_tileset.draw(17, _player.pos() * _tile_size + 30 - Vector2(_tile_size.x / 2.0f, 0.0f), _tile_size);
-
-	//Up
-	if (is_inside(_player.pos() + neighbour[UP]) == true)
-		_tileset.draw(18, _player.pos() * _tile_size + 30 - Vector2(0.0f, _tile_size.y / 2.0f), _tile_size);
-
-	// Right
-	if (is_inside(_player.pos() + neighbour[RIGHT]) == true)
-		_tileset.draw(19, _player.pos() * _tile_size + 30 + Vector2(_tile_size.x / 2.0f, 0.0f), _tile_size);
+	_player.draw(this);
 }
 
 Vector2 c_game_engine::calc_pos(Vector2 mouse_pos)
@@ -207,28 +179,33 @@ Vector2 c_game_engine::calc_pos(Vector2 mouse_pos)
 	mouse_pos -= 30;
 	mouse_pos /= _tile_size;
 	mouse_pos = mouse_pos.floor();
-	cout << "Mouse coord : " << mouse_pos << endl;
 	return (mouse_pos);
 }
 
 bool c_game_engine::can_move(Vector2 target)
 {
-	if (is_inside(target) == false || _player.pos().distance(target) > 1)
+	if (is_inside(target) == false || _player.is_active() == true || _player.pos().distance(target) > 1)
 		return (false);
 	return (true);
 }
 
-void c_game_engine::move_player(Vector2 target)
+void c_game_engine::actualize_tile(Vector2 target, tile_state p_state)
 {
 	for (int i = 0; i < 5; i++)
-	{
-		if (tile_status(_player.pos() + neighbour[i]) != tile_state::reveal)
-			set_tile_status(_player.pos() + neighbour[i], tile_state::discovered);
-	}
+		if (tile_status(target + neighbour[i]) != tile_state::reveal)
+			set_tile_status(target + neighbour[i], p_state);
+}
+
+void c_game_engine::move_player(Vector2 target, int nb_frame)
+{
+	actualize_tile(_player.pos(), tile_state::discovered);
+
+	_player.set_delta((target - _player.pos()) / nb_frame);
+	_player.set_old_pos(_player.pos());
 	_player.set_pos(target);
-	for (int i = 0; i < 5; i++)
-		if (tile_status(_player.pos() + neighbour[i]) != tile_state::reveal)
-			set_tile_status(_player.pos() + neighbour[i], tile_state::seen);
+	_player.set_nb_frame(nb_frame);
+
+	actualize_tile(_player.pos(), tile_state::seen);
 }
 
 bool c_game_engine::try_move(Vector2 delta)
@@ -248,17 +225,19 @@ bool c_game_engine::handle_keyboard()
 		g_application->quit();
 		return (true);
 	}
+	if (_player.is_moving() == true)
+		return (false);
 
-	if (g_keyboard->get_key(SDL_SCANCODE_W))
+	if (g_keyboard->get_key(SDL_SCANCODE_W) || g_keyboard->get_key(SDL_SCANCODE_UP))
 		return (try_move(neighbour[UP]));
 
-	if (g_keyboard->get_key(SDL_SCANCODE_S))
+	if (g_keyboard->get_key(SDL_SCANCODE_S) || g_keyboard->get_key(SDL_SCANCODE_DOWN))
 		return (try_move(neighbour[DOWN]));
 
-	if (g_keyboard->get_key(SDL_SCANCODE_A))
+	if (g_keyboard->get_key(SDL_SCANCODE_A) || g_keyboard->get_key(SDL_SCANCODE_LEFT))
 		return (try_move(neighbour[LEFT]));
 
-	if (g_keyboard->get_key(SDL_SCANCODE_D))
+	if (g_keyboard->get_key(SDL_SCANCODE_D) || g_keyboard->get_key(SDL_SCANCODE_RIGHT))
 		return (try_move(neighbour[RIGHT]));
 
 	return (false);
