@@ -58,8 +58,6 @@ void c_game_engine::populate_board()
 	_board[city_pos.x][city_pos.y].set_type(static_cast<tile_type>(1));
 	_board[city_pos.x][city_pos.y].set_status(tile_state::reveal);
 	_player.set_pos(Vector2(static_cast<int>(city_pos.x), static_cast<int>(city_pos.y)));
-	_player.set_draw_pos(_player.pos());
-	_player.set_old_pos(_player.pos());
 
 	for (int i = 0; i < _board_size.x; i++)
 		for (int j = 0; j < _board_size.y; j++)
@@ -184,7 +182,7 @@ Vector2 c_game_engine::calc_pos(Vector2 mouse_pos)
 
 bool c_game_engine::can_move(Vector2 target)
 {
-	if (is_inside(target) == false || _player.is_active() == true || _player.pos().distance(target) > 1)
+	if (is_inside(target) == false || _player.pos().distance(target) > 1)
 		return (false);
 	return (true);
 }
@@ -200,10 +198,7 @@ void c_game_engine::move_player(Vector2 target, int nb_frame)
 {
 	actualize_tile(_player.pos(), tile_state::discovered);
 
-	_player.set_delta((target - _player.pos()) / nb_frame);
-	_player.set_old_pos(_player.pos());
 	_player.set_pos(target);
-	_player.set_nb_frame(nb_frame);
 
 	actualize_tile(_player.pos(), tile_state::seen);
 }
@@ -225,8 +220,6 @@ bool c_game_engine::handle_keyboard()
 		g_application->quit();
 		return (true);
 	}
-	if (_player.is_moving() == true)
-		return (false);
 
 	if (g_keyboard->get_key(SDL_SCANCODE_W) || g_keyboard->get_key(SDL_SCANCODE_UP))
 		return (try_move(neighbour[UP]));
