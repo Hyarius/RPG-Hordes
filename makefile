@@ -1,4 +1,4 @@
-NAME=		state_of_survie
+NAME=		Rpg-Hordes
 
 ##
 ##		RESSOURCES
