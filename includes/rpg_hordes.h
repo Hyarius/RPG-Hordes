@@ -3,4 +3,6 @@
 
 #include "jgl.h"
 
+#include "rpg_main_window.h"
+
 #endif
